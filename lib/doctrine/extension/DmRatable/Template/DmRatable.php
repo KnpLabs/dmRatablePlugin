@@ -5,6 +5,20 @@
  */
 class Doctrine_Template_DmRatable extends Doctrine_Template
 {
+  protected $_options = array(
+    'className'     => '%CLASS%Rate',
+    'tableName'     => false,
+    'generateFiles' => false,
+    'table'         => false,
+    'pluginTable'   => false,
+    'children'      => array(),
+    'options'       => array(),
+    'field'         => 'rate',
+    'max_rate'      => 5,
+    'rounding_rate' => 1,
+    'user'          => array('class' => 'DmUser', 'type'  => 'integer')
+  );
+
   public function __construct(array $options = array())
   {
     parent::__construct($options);
@@ -31,6 +45,11 @@ class Doctrine_Template_DmRatable extends Doctrine_Template
     return $this->_plugin;
   }
 
+  public function getRatableHash()
+  {
+    return dmString::encode(array(get_class($this->getInvoker()), $this->getInvoker()->getId()));
+  }
+
   /**
    *
    * @return array() with accorded rating
@@ -39,22 +58,12 @@ class Doctrine_Template_DmRatable extends Doctrine_Template
   {
     $select_format = 'AVG(r.%s) %s';
 
-    $q = $this->getRatesQuery();
-
-    foreach ($this->getDmRatable()->getOption('criterias') as $column)
-    {
-      $select[] = sprintf($select_format, $column, $column);
-    }
-
-    $q->select(implode(', ', $select));
+    $q = $this->getRatesQuery()->select($this->getDmRatable()->getOption('field'));
     
-    $rates = $q->fetchArray();
+    $rate = $q->fetchValue();
+    $rate = $rate ?: 0;
 
-    foreach ($rates[0] as $key => $value) {
-      $rounded_rates[$key] = $this->round($value);
-    }
-
-    return $rounded_rates;
+    return $this->round($rate);
   }
 
   public function round($value)
@@ -76,26 +85,28 @@ class Doctrine_Template_DmRatable extends Doctrine_Template
    *
    * @return boolean true if ok, false else
    */
-  public function addRate($rate)
+  public function addRate(array $rateData)
   {
-    $related = $this->getDmRatable()->getOption('className');
-    $rate_obj = new $related();
-    $rate_obj->merge($rate);
-
-    if(!$this->getDmRatable()->getOption('user'))
+    if($rate = $this->getRatesQuery()->addWhere('dm_user_id = ?', $rateData['dm_user_id'])->fetchOne())
     {
-      $fk = $this->getDmRatable()->getRatedObjectFk();
-      $rate_obj->$fk = $this->getInvoker()->id;
+      $rate->rate = $rateData['rate'];
     }
     else
     {
-      $rate_obj->id = $this->getInvoker()->id;
+      $rate = dmDb::create($this->getDmRatable()->getOption('className'), $rateData);
     }
 
-    $rate_obj->save();
-
-    $this->getInvoker()->link('Rates', $rate_obj->id);
+    $rate->save();
   }
+
+  public function cancelRate(array $rateData)
+  {
+    if($rate = $this->getRatesQuery()->addWhere('dm_user_id = ?', $rateData['dm_user_id'])->fetchOne())
+    {
+      $rate->delete();
+    }
+  }
+
 
   /**
    *

@@ -2,19 +2,6 @@
 
 class Doctrine_DmRatable extends Doctrine_Record_Generator
 {
-  protected $_options = array(
-    'className'     => '%CLASS%Rate',
-    'tableName'     => false,
-    'generateFiles' => false,
-    'table'         => false,
-    'pluginTable'   => false,
-    'children'      => array(),
-    'options'       => array(),
-    'criterias'     => array('rate'),
-    'max_rate'      => 5,
-    'rounding_rate' => 1,
-    'user'          => array('class' => 'DmUser', 'type'  => 'integer'),
-  );
 
   /**
    * __construct
@@ -54,10 +41,7 @@ class Doctrine_DmRatable extends Doctrine_Record_Generator
 
     $options['range'] = array(1 => $this->_options['max_rate']);
 
-    foreach ($this->_options['criterias'] as $fieldName)
-    {
-      $this->hasColumn($fieldName, $type, $length, $options);
-    }
+    $this->hasColumn($this->_options['field'], $type, $length, $options);
     unset($options['range']);
 
     if($this->_options['user'])
