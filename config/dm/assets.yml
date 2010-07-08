@@ -1,0 +1,11 @@
+js:
+
+  dmRatablePlugin:
+    
+    stars:            jquery.ui.stars.min
+
+css:
+
+  dmRatablePlugin:
+    
+    stars:            jquery.ui.stars
