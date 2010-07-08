@@ -59,3 +59,22 @@ To enable the jquery.stars plugin, paste the following code to your web/js/front
     });
 
 Then customize it to fit your needs.
+
+## Admin
+
+To show the rating of each record in its admin module, add a _rating partial:
+
+    # apps/admin/modules/article/config/generator.yml
+    
+      list:
+        display:
+          - _rating
+
+    # apps/admin/modules/article/templates/_rating.php
+
+    <?php
+    echo sprintf('%d/%d',
+      $article->getRating(),
+      $article->getTable()->getTemplate('DmRatable')->getOption('max_rate')
+    );
+
