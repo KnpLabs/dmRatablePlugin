@@ -94,6 +94,7 @@ class Doctrine_Template_DmRatable extends Doctrine_Template
     else
     {
       $rate = dmDb::create($this->getDmRatable()->getOption('className'), $rateData);
+      $rate->id = $this->getInvoker()->id;
     }
 
     $rate->save();
@@ -106,7 +107,6 @@ class Doctrine_Template_DmRatable extends Doctrine_Template
       $rate->delete();
     }
   }
-
 
   /**
    *
