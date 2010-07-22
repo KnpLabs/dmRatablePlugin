@@ -61,7 +61,7 @@ class Doctrine_Template_DmRatable extends Doctrine_Template
     $q = $this->getRatesQuery()->select($this->getDmRatable()->getOption('field'));
     
     $rate = $q->fetchValue();
-    $rate = $rate ?: 0;
+    $rate = $rate ? $rate : 0;
 
     return $this->round($rate);
   }
