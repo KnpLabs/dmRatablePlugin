@@ -109,6 +109,16 @@ class Doctrine_Template_DmRatable extends Doctrine_Template
   }
 
   /**
+   * The maximum rating this record can receive
+   *
+   * @return int
+   **/
+  public function getMaxRate()
+  {
+      return $this->getOption('max_rate');
+  }
+
+  /**
    *
    * @return boolean true if ok, false else
    */
