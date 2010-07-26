@@ -26,12 +26,14 @@ class dmRatableActions extends dmBaseActions
     if($value)
     {
       $record->addRate($rate);
+      $message = $this->getService('i18n')->__('Rating saved (%rate%)', array('%rate%' => $value));
     }
     else
     {
       $record->cancelRate($rate);
+      $message = $this->getService('i18n')->__('Rating removed');
     }
 
-    return $this->renderJson(array('new_value' => $record->getRating()));
+    return $this->renderComponent('dmRatable', 'rating', array('record' => $record, 'message' => $message));
   }
 }
